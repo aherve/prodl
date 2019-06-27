@@ -5,7 +5,7 @@ api:
   environment:
     NODE_ENV: 'development'
   volumes:
-    - .:/app
+    - ./api:/app
     - /app/node_modules
   ports:
     - "0.0.0.0:9000:9000"
@@ -14,16 +14,16 @@ api:
 transpiler:
   build: api
   volumes:
-    - .:/app
+    - ./api:/app
     - /app/node_modules
   command: ["tsc", "-w"]
 
 linter:
   build: api
   volumes:
-    - .:/app
+    - ./api:/app
     - /app/node_modules
-  command: nodemon --delay 500ms --exec "tslint --project api/ "
+  command: nodemon --delay 500ms --exec "tslint --project ."
 
 mongo:
   image: mongo:3.6.6
@@ -34,7 +34,7 @@ mongo:
 mocha:
   build: api
   volumes:
-    - .:/app
+    - ./api:/app
     - /app/node_modules
   links:
     - 'mongo:mongo'
