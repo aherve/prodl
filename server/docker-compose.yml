@@ -1,29 +1,29 @@
 api:
-  build: server
+  build: .
   links:
     - 'mongo:mongo'
   environment:
     NODE_ENV: 'development'
   volumes:
-    - ./server:/app
+    - .:/app
     - /app/node_modules
   ports:
     - "0.0.0.0:9000:9000"
   command: sh -c "mkdir -p dist && touch ./dist/app.js && nodemon --delay 500ms --watch dist ./dist/app.js"
 
 transpiler:
-  build: server
+  build: .
   volumes:
-    - ./server:/app
+    - .:/app
     - /app/node_modules
   command: ["tsc", "-w"]
 
 linter:
-  build: server
+  build: .
   volumes:
-    - ./server:/app
+    - .:/app
     - /app/node_modules
-  command: nodemon --delay 500ms --exec "tslint --project ."
+  command: nodemon --delay 500ms --exec "find . -path ./ -prune -o -path ./node_modules -prune -o -path ./dist -prune -o -name '*.ts' -print | xargs tslint"
 
 mongo:
   image: mongo:3.6.6
@@ -32,9 +32,9 @@ mongo:
   command: ["mongod"]
 
 mocha:
-  build: server
+  build: .
   volumes:
-    - ./server:/app
+    - .:/app
     - /app/node_modules
   links:
     - 'mongo:mongo'
