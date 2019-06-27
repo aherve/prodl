@@ -1,0 +1,43 @@
+api:
+  build: api
+  links:
+    - 'mongo:mongo'
+  environment:
+    NODE_ENV: 'development'
+  volumes:
+    - .:/app
+    - /app/node_modules
+  ports:
+    - "0.0.0.0:9000:9000"
+  command: sh -c "mkdir -p dist && touch ./dist/app.js && nodemon --delay 500ms --watch dist ./dist/app.js"
+
+transpiler:
+  build: api
+  volumes:
+    - .:/app
+    - /app/node_modules
+  command: ["tsc", "-w"]
+
+linter:
+  build: api
+  volumes:
+    - .:/app
+    - /app/node_modules
+  command: nodemon --delay 500ms --exec "tslint --project api/ "
+
+mongo:
+  image: mongo:3.6.6
+  ports:
+    - "27017"
+  command: ["mongod"]
+
+mocha:
+  build: api
+  volumes:
+    - .:/app
+    - /app/node_modules
+  links:
+    - 'mongo:mongo'
+  command: nodemon --delay 500ms --exec 'mocha --recursive --bail --colors' ./dist
+  environment:
+    NODE_ENV: 'test'
